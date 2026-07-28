@@ -2,6 +2,7 @@ const postmarkTransport = require('nodemailer-postmark-transport');
 const nodemailer = require('nodemailer');
 
 const { crearHtmlParaCorreoCotizacion, crearHtmlParaCorreoEstimacion } = require('../utils/templates');
+const { crearHtmlReservaInterna, crearHtmlConfirmacionCliente } = require('../utils/reservationTemplates');
 
 
 const sendMailCotizacion = async (body) => {
@@ -80,7 +81,54 @@ const sendMailEstimacion = async (body) => {
 
 }
 
+const sendMailReserva = async (body, contractPdf) => {
+  const transport = nodemailer.createTransport(
+    postmarkTransport({
+      auth: {
+        apiKey: process.env.POSTMARKKEY
+      }
+    })
+  );
+  const from = 'demenagement@transportdoublez.com';
+  const reservationEmail = process.env.RESERVATION_EMAIL || from;
+  const clientName = `${body.contact.firstName} ${body.contact.lastName}`;
+
+  try {
+    await Promise.all([
+      transport.sendMail({
+        from,
+        to: reservationEmail,
+        subject: `${body.quoteId} · Nouvelle demande de ${clientName}`,
+        text: `Nouvelle demande ${body.quoteId} de ${clientName}`,
+        html: crearHtmlReservaInterna(body),
+        attachments: [{
+          filename: `contrat-${body.quoteId}.pdf`,
+          content: contractPdf,
+          contentType: 'application/pdf'
+        }]
+      }),
+      transport.sendMail({
+        from,
+        to: body.contact.email,
+        subject: `${body.quoteId} · Transport Double Z`,
+        text: `Votre demande ${body.quoteId} a été reçue.`,
+        html: crearHtmlConfirmacionCliente(body),
+        attachments: [{
+          filename: `contrat-${body.quoteId}.pdf`,
+          content: contractPdf,
+          contentType: 'application/pdf'
+        }]
+      })
+    ]);
+    return true;
+  } catch (error) {
+    console.error('Error al enviar la reserva por correo:', error);
+    return false;
+  }
+};
+
 module.exports = {
   sendMailCotizacion,
-  sendMailEstimacion
-}  
+  sendMailEstimacion,
+  sendMailReserva
+}
