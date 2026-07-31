@@ -20,7 +20,7 @@ const createContractPdf = (reservation) => new Promise((resolve, reject) => {
     bufferPages: true,
     info: {
       Title: `Entente de service ${reservation.quoteId}`,
-      Author: 'Transport Double Z',
+      Author: 'Groupe Double Z',
       Subject: 'Résumé contractuel et instructions de dépôt'
     }
   });
@@ -66,7 +66,7 @@ const createContractPdf = (reservation) => new Promise((resolve, reject) => {
   doc.rect(0, 0, doc.page.width, 118).fill(COLORS.black);
   doc.rect(48, 30, 96, 26).fill(COLORS.red);
   doc.font('Helvetica-Bold').fontSize(12).fillColor(COLORS.white).text('GROUPE Z', 61, 38);
-  doc.font('Helvetica-Bold').fontSize(21).fillColor(COLORS.white).text('TRANSPORT DOUBLE Z', 48, 70);
+  doc.font('Helvetica-Bold').fontSize(21).fillColor(COLORS.white).text('GROUPE DOUBLE Z', 48, 70);
   doc.font('Helvetica').fontSize(9).fillColor('#D4D4D8').text('ENTENTE DE SERVICE ET RÉSERVATION', 330, 76, {
     width: 214,
     align: 'right'
@@ -106,7 +106,7 @@ const createContractPdf = (reservation) => new Promise((resolve, reject) => {
 
   sectionTitle('Conditions de réservation');
   clause(1, 'Estimation', 'Le montant indiqué est une estimation basée sur les informations fournies par le client. Le prix final est établi selon le temps réel requis et les conditions constatées sur place.');
-  clause(2, 'Acompte', `Un acompte de ${money(deposit.amount)} est requis pour bloquer la date. Il est déduit du montant final. La date n’est pas réservée avant la confirmation de réception de l’acompte par Transport Double Z.`);
+  clause(2, 'Acompte', `Un acompte de ${money(deposit.amount)} est requis pour bloquer la date. Il est déduit du montant final. La date n’est pas réservée avant la confirmation de réception de l’acompte par Groupe Double Z.`);
   clause(3, 'Annulation', `Si le client annule moins de ${reservation.cancellationDeadlineHours || 48} heures avant la date prévue, l’acompte versé n’est pas remboursable, car il couvre le blocage de la date et les frais administratifs. Passé ce délai, l’acompte est remboursable.`);
   clause(4, 'Accès', 'Le client s’assure que les accès et le stationnement sont disponibles. Les attentes causées par un accès bloqué sont facturées au taux horaire.');
   clause(5, 'Assurance', 'Une assurance cargo de base est incluse. Les objets de grande valeur doivent être déclarés à l’avance.');
@@ -127,7 +127,7 @@ const createContractPdf = (reservation) => new Promise((resolve, reject) => {
     doc.page.margins.bottom = 0;
     doc.font('Helvetica').fontSize(8).fillColor(COLORS.gray)
       .text(
-        `Transport Double Z | ${reservation.quoteId} | Page ${pageIndex + 1} de ${range.count}`,
+        `Groupe Double Z | ${reservation.quoteId} | Page ${pageIndex + 1} de ${range.count}`,
         48,
         doc.page.height - 28,
         { width, align: 'center', lineBreak: false }

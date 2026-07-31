@@ -26,7 +26,7 @@ const createQuickQuotePdf = (quote) => new Promise((resolve, reject) => {
     .font('Helvetica-Bold')
     .fontSize(22)
     .fillColor('#dc2626')
-    .text('Transport Double Z');
+    .text('Groupe Double Z');
 
   doc
     .font('Helvetica-Bold')
@@ -90,7 +90,7 @@ const createQuickQuotePdf = (quote) => new Promise((resolve, reject) => {
     .fontSize(10)
     .fillColor('#4b5563')
     .text(
-      "Cette demande rapide ne confirme pas automatiquement la disponibilite. L'equipe de Transport Double Z vous contactera pour valider la date, le volume, l'acces et les modalites du depot.",
+      "Cette demande rapide ne confirme pas automatiquement la disponibilite. L'equipe de Groupe Double Z vous contactera pour valider la date, le volume, l'acces et les modalites du depot.",
       { width: 500, lineGap: 3 }
     );
 
@@ -98,7 +98,7 @@ const createQuickQuotePdf = (quote) => new Promise((resolve, reject) => {
   doc
     .fontSize(10)
     .fillColor('#6b7280')
-    .text('514 216-9396 | demenagement@transportdoublez.com | transportdoublez.com');
+    .text('5142349971 | demenagement@transportdoublez.com | transportdoublez.com');
 
   doc.end();
 });

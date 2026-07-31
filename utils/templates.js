@@ -182,7 +182,7 @@ const crearHtmlParaCorreoCotizacion = (nombre, mensaje, courriel, telefono) => {
                          </table></td>
                        </tr>
                        <tr>
-                        <td align="center" style="padding:0;Margin:0;padding-bottom:35px"><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:18px;color:#333333;font-size:12px">© Transport Doublez 2024 | Conception web et SEO:BandSoft.</p></td>
+                        <td align="center" style="padding:0;Margin:0;padding-bottom:35px"><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:18px;color:#333333;font-size:12px">© Groupe Double Z 2024 | Conception web et SEO:BandSoft.</p></td>
                        </tr>
                      </table></td>
                    </tr>
@@ -443,7 +443,7 @@ const crearHtmlParaCorreoEstimacion = (date, name, tel, cell, email, street, cit
                           </table></td>
                         </tr>
                         <tr>
-                         <td align="center" style="padding:0;Margin:0;padding-bottom:35px"><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:18px;color:#333333;font-size:12px">© Transport Doublez 2024 | Conception web et SEO:BandSoft.</p></td>
+                         <td align="center" style="padding:0;Margin:0;padding-bottom:35px"><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:18px;color:#333333;font-size:12px">© Groupe Double Z 2024 | Conception web et SEO:BandSoft.</p></td>
                         </tr>
                       </table></td>
                     </tr>

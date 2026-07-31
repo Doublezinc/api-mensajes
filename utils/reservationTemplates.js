@@ -29,7 +29,7 @@ const shell = (title, content) => `<!doctype html>
   <body style="margin:0;background:#f3f4f6;font-family:Arial,sans-serif;color:#18181b">
     <div style="max-width:680px;margin:0 auto;padding:32px 16px">
       <div style="background:#0e0e0e;color:#fff;padding:24px 28px;border-top:5px solid #e8171f">
-        <div style="font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:#d4d4d8">Transport Double Z</div>
+        <div style="font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:#d4d4d8">Groupe Double Z</div>
         <h1 style="margin:8px 0 0;font-size:25px">${escapeHtml(title)}</h1>
       </div>
       <div style="background:#fff;padding:28px">${content}</div>

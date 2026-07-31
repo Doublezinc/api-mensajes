@@ -187,7 +187,7 @@ const sendMailReserva = async (body, contractPdf) => {
       transport.sendMail({
         from,
         to: body.contact.email,
-        subject: `${body.quoteId} · Transport Double Z`,
+        subject: `${body.quoteId} · Groupe Double Z`,
         text: `Votre demande ${body.quoteId} a été reçue.`,
         html: crearHtmlConfirmacionCliente(body),
         attachments: [{

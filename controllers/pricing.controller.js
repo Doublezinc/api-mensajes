@@ -9,8 +9,13 @@ const EDITABLE_FIELDS = [
   'currency',
   'crewSize',
   'hourlyRatePerMover',
+  'hourlyRateTwoMoversTruck20Ft',
+  'hourlyRateThreeMoversTruck20Ft',
+  'hourlyCrewRates',
   'minimumHours',
   'transportationFee',
+  'furnitureApplianceDeliveryFee',
+  'fixedRateFee',
   'stairFeePerFloor',
   'protectionMaterialsFee',
   'packingMaterialsFee',
@@ -20,6 +25,27 @@ const EDITABLE_FIELDS = [
   'qstRate',
   'cancellationDeadlineHours'
 ];
+
+const normalizeRules = (rules) => {
+  const normalized = { ...DEFAULTS, ...rules };
+  if (!Array.isArray(normalized.hourlyCrewRates) || normalized.hourlyCrewRates.length === 0) {
+    normalized.hourlyCrewRates = [
+      {
+        movers: 2,
+        truck: '20 pies',
+        hourlyRate: normalized.hourlyRateTwoMoversTruck20Ft,
+        active: true
+      },
+      {
+        movers: 3,
+        truck: '20 pies',
+        hourlyRate: normalized.hourlyRateThreeMoversTruck20Ft,
+        active: true
+      }
+    ];
+  }
+  return normalized;
+};
 
 const obtenerReglas = async (req = request, res = response) => {
   if (!databaseIsReady()) {
@@ -31,6 +57,7 @@ const obtenerReglas = async (req = request, res = response) => {
     if (!doc) {
       doc = (await PricingRules.create(DEFAULTS)).toObject();
     }
+    doc = normalizeRules(doc);
     return res.json({ ok: true, item: doc, persisted: true });
   } catch (error) {
     console.error('Error al consultar las tarifas:', error);
@@ -53,6 +80,12 @@ const actualizarReglas = async (req = request, res = response) => {
     if (!doc) {
       doc = new PricingRules({ ...DEFAULTS, ...patch });
     } else {
+      Object.entries(DEFAULTS).forEach(([field, value]) => {
+        if (doc[field] === undefined) doc[field] = value;
+      });
+      if (!Array.isArray(doc.hourlyCrewRates) || doc.hourlyCrewRates.length === 0) {
+        doc.hourlyCrewRates = normalizeRules(doc.toObject()).hourlyCrewRates;
+      }
       Object.assign(doc, patch);
     }
     doc.version = `custom-${Date.now()}`;
