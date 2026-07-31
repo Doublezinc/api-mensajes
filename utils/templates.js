@@ -1,5 +1,10 @@
+const { escapeHtml } = require('./escapeHtml');
 
 const crearHtmlParaCorreoCotizacion = (nombre, mensaje, courriel, telefono) => {
+  nombre = escapeHtml(nombre);
+  mensaje = escapeHtml(mensaje);
+  courriel = escapeHtml(courriel);
+  telefono = escapeHtml(telefono);
 
   return htmlCorreo = `<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
   <html dir="ltr" xmlns="http://www.w3.org/1999/xhtml" xmlns:o="urn:schemas-microsoft-com:office:office" lang="en">
@@ -195,6 +200,33 @@ const crearHtmlParaCorreoCotizacion = (nombre, mensaje, courriel, telefono) => {
 
 const crearHtmlParaCorreoEstimacion = (date, name, tel, cell, email, street, city, postalCode, province, numRooms, floor, elevator, refrigerator, stove, washer, dryer, dishwasher, divanTwoPlace, divanthreePlace, bureau, table, lit, armoire, others, numberBoxes,
   comments, streetNumber, would, codePostal, provinceArrival, numberPieces, floorArrival, elevatorArrival) => {
+  date = escapeHtml(date);
+  name = escapeHtml(name);
+  tel = escapeHtml(tel);
+  cell = escapeHtml(cell);
+  email = escapeHtml(email);
+  street = escapeHtml(street);
+  city = escapeHtml(city);
+  postalCode = escapeHtml(postalCode);
+  province = escapeHtml(province);
+  numRooms = escapeHtml(numRooms);
+  floor = escapeHtml(floor);
+  divanTwoPlace = escapeHtml(divanTwoPlace);
+  divanthreePlace = escapeHtml(divanthreePlace);
+  bureau = escapeHtml(bureau);
+  table = escapeHtml(table);
+  lit = escapeHtml(lit);
+  armoire = escapeHtml(armoire);
+  others = escapeHtml(others);
+  numberBoxes = escapeHtml(numberBoxes);
+  comments = escapeHtml(comments);
+  streetNumber = escapeHtml(streetNumber);
+  would = escapeHtml(would);
+  codePostal = escapeHtml(codePostal);
+  provinceArrival = escapeHtml(provinceArrival);
+  numberPieces = escapeHtml(numberPieces);
+  floorArrival = escapeHtml(floorArrival);
+
   return htmlCorreo = `
    <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
    <html dir="ltr" xmlns="http://www.w3.org/1999/xhtml" xmlns:o="urn:schemas-microsoft-com:office:office" lang="fr">

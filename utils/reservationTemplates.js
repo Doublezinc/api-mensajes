@@ -45,7 +45,6 @@ const depositBlock = (deposit, labels) => `
       ${line(labels.method, deposit.method)}
       ${line(labels.recipient, deposit.recipient)}
       ${line(labels.email, deposit.email)}
-      ${line(labels.phone, deposit.phone)}
       ${line(labels.amount, money(deposit.amount))}
       ${line(labels.reference, deposit.reference)}
       ${line(labels.deadline, `${deposit.deadlineHours} h`)}
@@ -79,35 +78,35 @@ const crearHtmlReservaInterna = (body) => {
 const CLIENT_COPY = {
   fr: {
     title: 'Demande reçue', hello: 'Bonjour', received: 'Nous avons reçu votre demande et votre acceptation des conditions.',
-    pending: 'Votre date n’est pas encore réservée. Elle sera bloquée lorsque Transport Double Z aura confirmé la réception de l’acompte.',
+    pending: 'Notre équipe vous contactera dans les 24 h pour confirmer la date et percevoir l’acompte. Vous pouvez aussi effectuer le dépôt dès maintenant avec la référence indiquée pour accélérer la confirmation.',
     moveDate: 'Date du déménagement', route: 'Trajet', estimate: 'Estimation',
     contract: 'Votre contrat est joint à ce courriel.',
-    nonRefundable: 'L’acompte versé n’est pas remboursable en cas d’annulation par le client.',
+    nonRefundable: hours => `Si vous annulez moins de ${hours} heures avant la date prévue, l’acompte versé n’est pas remboursable. Passé ce délai, il est remboursable.`,
     keep: 'Conservez ce numéro pour toute communication.',
-    deposit: { title: 'Dépôt à effectuer', example: 'Attention : ces coordonnées sont des données d’exemple.', method: 'Méthode', recipient: 'Destinataire', email: 'Courriel', phone: 'Téléphone', amount: 'Montant', reference: 'Référence', deadline: 'Délai' }
+    deposit: { title: 'Dépôt à effectuer', example: 'Attention : ces coordonnées sont des données d’exemple.', method: 'Méthode', recipient: 'Destinataire', email: 'Courriel', amount: 'Montant', reference: 'Référence', deadline: 'Délai' }
   },
   en: {
     title: 'Request received', hello: 'Hello', received: 'We received your request and acceptance of the terms.',
-    pending: 'Your date is not reserved yet. It will be held once Transport Double Z confirms receipt of the deposit.',
+    pending: 'Our team will contact you within 24 h to confirm the date and collect the deposit. You can also send the deposit now using the reference below to speed up confirmation.',
     moveDate: 'Moving date', route: 'Route', estimate: 'Estimate',
     contract: 'Your contract is attached to this email.',
-    nonRefundable: 'The deposit is non-refundable if the client cancels.',
+    nonRefundable: hours => `If you cancel less than ${hours} hours before the scheduled date, the deposit is non-refundable. Beyond that, it is refundable.`,
     keep: 'Keep this number for all communications.',
-    deposit: { title: 'Deposit instructions', example: 'Warning: these are example payment details.', method: 'Method', recipient: 'Recipient', email: 'Email', phone: 'Phone', amount: 'Amount', reference: 'Reference', deadline: 'Deadline' }
+    deposit: { title: 'Deposit instructions', example: 'Warning: these are example payment details.', method: 'Method', recipient: 'Recipient', email: 'Email', amount: 'Amount', reference: 'Reference', deadline: 'Deadline' }
   },
   es: {
     title: 'Solicitud recibida', hello: 'Hola', received: 'Recibimos su solicitud y la aceptación de las condiciones.',
-    pending: 'Su fecha todavía no está reservada. Se bloqueará cuando Transport Double Z confirme la recepción del anticipo.',
+    pending: 'Nuestro equipo se comunicará con usted en 24 h para confirmar la fecha y recibir el anticipo. También puede realizar el depósito ahora mismo con la referencia indicada para acelerar la confirmación.',
     moveDate: 'Fecha de mudanza', route: 'Trayecto', estimate: 'Estimación',
     contract: 'Su contrato está adjunto a este correo.',
-    nonRefundable: 'El anticipo no es reembolsable si el cliente cancela.',
+    nonRefundable: hours => `Si cancela con menos de ${hours} horas de anticipación a la fecha prevista, el anticipo no es reembolsable. Antes de ese plazo, sí es reembolsable.`,
     keep: 'Conserve este número para cualquier comunicación.',
-    deposit: { title: 'Datos para el anticipo', example: 'Atención: estos son datos de pago de ejemplo.', method: 'Método', recipient: 'Destinatario', email: 'Correo', phone: 'Teléfono', amount: 'Importe', reference: 'Referencia', deadline: 'Plazo' }
+    deposit: { title: 'Datos para el anticipo', example: 'Atención: estos son datos de pago de ejemplo.', method: 'Método', recipient: 'Destinatario', email: 'Correo', amount: 'Importe', reference: 'Referencia', deadline: 'Plazo' }
   }
 };
 
 const crearHtmlConfirmacionCliente = (body) => {
-  const { quoteId, language, contact, addresses, estimate, depositInstructions } = body;
+  const { quoteId, language, contact, addresses, estimate, depositInstructions, cancellationDeadlineHours } = body;
   const copy = CLIENT_COPY[language] || CLIENT_COPY.fr;
   return shell(`${copy.title} - ${quoteId}`, `
     <p>${escapeHtml(copy.hello)} ${escapeHtml(contact.firstName)},</p>
@@ -119,7 +118,7 @@ const crearHtmlConfirmacionCliente = (body) => {
       ${line(copy.estimate, `${money(estimate.totalLow)} - ${money(estimate.totalHigh)}`)}
     </table>
     ${depositBlock(depositInstructions, copy.deposit)}
-    <p><strong>${escapeHtml(copy.nonRefundable)}</strong></p>
+    <p><strong>${escapeHtml(copy.nonRefundable(cancellationDeadlineHours || 48))}</strong></p>
     <p>${escapeHtml(copy.contract)}</p>
     <p>${escapeHtml(copy.keep)} <strong>${escapeHtml(quoteId)}</strong></p>
   `);

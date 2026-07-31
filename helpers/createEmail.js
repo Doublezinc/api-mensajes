@@ -81,6 +81,83 @@ const sendMailEstimacion = async (body) => {
 
 }
 
+const escapeHtml = (value = '') => String(value)
+  .replace(/&/g, '&amp;')
+  .replace(/</g, '&lt;')
+  .replace(/>/g, '&gt;')
+  .replace(/"/g, '&quot;')
+  .replace(/'/g, '&#039;');
+
+const sendMailDevisRapide = async (body, quickQuotePdf) => {
+  console.log('Enviando devis rapide por correo');
+
+  const {
+    origin,
+    destination,
+    housing,
+    rooms,
+    access,
+    date,
+    phone,
+    estimate
+  } = body;
+
+  try {
+    const transport = nodemailer.createTransport(
+      postmarkTransport({
+        auth: {
+          apiKey: process.env.POSTMARKKEY
+        }
+      })
+    );
+
+    const rows = [
+      ['Depart', origin],
+      ['Arrivee', destination],
+      ['Logement', housing],
+      ['Pieces', rooms],
+      ['Acces', access],
+      ['Date souhaitee', date],
+      ['Telephone', phone],
+      ['Estimation indicative', estimate]
+    ];
+
+    const htmlRows = rows.map(([label, value]) => `
+      <tr>
+        <td style="padding:8px 12px;color:#606775;border-bottom:1px solid #e5e7eb">${escapeHtml(label)}</td>
+        <td style="padding:8px 12px;font-weight:700;border-bottom:1px solid #e5e7eb">${escapeHtml(value || '-')}</td>
+      </tr>
+    `).join('');
+
+    const info = await transport.sendMail({
+      from: 'demenagement@transportdoublez.com',
+      to: process.env.RESERVATION_EMAIL || 'demenagement@transportdoublez.com',
+      subject: `Devis rapide - ${phone}`,
+      text: `Devis rapide: ${phone} | ${origin || '-'} -> ${destination || '-'} | ${date || '-'}`,
+      html: `
+        <div style="font-family:Arial,sans-serif;color:#111827;max-width:640px;margin:auto">
+          <h1 style="margin:0 0 12px;color:#dc2626">Nouvelle demande rapide</h1>
+          <p style="margin:0 0 18px;color:#4b5563">Un client a rempli le formulaire de devis en 60 secondes.</p>
+          <table style="width:100%;border-collapse:collapse;background:#fff;border:1px solid #e5e7eb">
+            ${htmlRows}
+          </table>
+        </div>
+      `,
+      attachments: quickQuotePdf ? [{
+        filename: `devis-rapide-${phone.replace(/\D/g, '') || 'client'}.pdf`,
+        content: quickQuotePdf,
+        contentType: 'application/pdf'
+      }] : []
+    });
+
+    console.log("Message sent: %s", info.messageId);
+    return true;
+  } catch (error) {
+    console.error('Error al enviar devis rapide por correo:', error);
+    return false;
+  }
+};
+
 const sendMailReserva = async (body, contractPdf) => {
   const transport = nodemailer.createTransport(
     postmarkTransport({
@@ -130,5 +207,6 @@ const sendMailReserva = async (body, contractPdf) => {
 module.exports = {
   sendMailCotizacion,
   sendMailEstimacion,
+  sendMailDevisRapide,
   sendMailReserva
 }

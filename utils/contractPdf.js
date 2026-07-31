@@ -90,9 +90,9 @@ const createContractPdf = (reservation) => new Promise((resolve, reject) => {
   row('Acompte requis', money(deposit.amount));
   row('Solde', 'Payable le jour du déménagement selon le prix final');
 
-  ensureSpace(150);
+  ensureSpace(135);
   const depositBoxY = doc.y;
-  doc.roundedRect(48, depositBoxY, width, 136, 3).fill(COLORS.light);
+  doc.roundedRect(48, depositBoxY, width, 119, 3).fill(COLORS.light);
   const depositY = depositBoxY + 16;
   doc.font('Helvetica-Bold').fontSize(12).fillColor(COLORS.red)
     .text(deposit.isExample ? 'INSTRUCTIONS DE DÉPÔT - DONNÉES D’EXEMPLE' : 'INSTRUCTIONS DE DÉPÔT', 64, depositY);
@@ -100,15 +100,14 @@ const createContractPdf = (reservation) => new Promise((resolve, reject) => {
     .text(`Méthode : ${deposit.method}`, 64, depositY + 25)
     .text(`Destinataire : ${deposit.recipient}`, 64, depositY + 42)
     .text(`Courriel : ${deposit.email}`, 64, depositY + 59)
-    .text(`Téléphone : ${deposit.phone}`, 64, depositY + 76)
-    .text(`Montant : ${money(deposit.amount)} | Référence : ${deposit.reference}`, 64, depositY + 93)
-    .text(`Délai : ${deposit.deadlineHours} h. ${deposit.note}`, 64, depositY + 110, { width: width - 32 });
-  doc.y = depositBoxY + 146;
+    .text(`Montant : ${money(deposit.amount)} | Référence : ${deposit.reference}`, 64, depositY + 76)
+    .text(`Délai : ${deposit.deadlineHours} h. ${deposit.note}`, 64, depositY + 93, { width: width - 32 });
+  doc.y = depositBoxY + 129;
 
   sectionTitle('Conditions de réservation');
   clause(1, 'Estimation', 'Le montant indiqué est une estimation basée sur les informations fournies par le client. Le prix final est établi selon le temps réel requis et les conditions constatées sur place.');
   clause(2, 'Acompte', `Un acompte de ${money(deposit.amount)} est requis pour bloquer la date. Il est déduit du montant final. La date n’est pas réservée avant la confirmation de réception de l’acompte par Transport Double Z.`);
-  clause(3, 'Annulation', 'En cas d’annulation par le client, l’acompte versé n’est pas remboursable, car il couvre le blocage de la date et les frais administratifs.');
+  clause(3, 'Annulation', `Si le client annule moins de ${reservation.cancellationDeadlineHours || 48} heures avant la date prévue, l’acompte versé n’est pas remboursable, car il couvre le blocage de la date et les frais administratifs. Passé ce délai, l’acompte est remboursable.`);
   clause(4, 'Accès', 'Le client s’assure que les accès et le stationnement sont disponibles. Les attentes causées par un accès bloqué sont facturées au taux horaire.');
   clause(5, 'Assurance', 'Une assurance cargo de base est incluse. Les objets de grande valeur doivent être déclarés à l’avance.');
 

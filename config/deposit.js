@@ -8,7 +8,6 @@ const getDepositInstructions = (quoteId, amount) => {
     method: process.env.DEPOSIT_METHOD || 'Virement Interac',
     recipient: process.env.DEPOSIT_RECIPIENT || 'Groupe Double Z - EXEMPLE',
     email: process.env.DEPOSIT_EMAIL || 'depot-doublez@example.com',
-    phone: process.env.DEPOSIT_PHONE || '514-555-0199',
     amount: Number(amount || 150),
     currency: 'CAD',
     deadlineHours: Number(process.env.DEPOSIT_DEADLINE_HOURS || 24),

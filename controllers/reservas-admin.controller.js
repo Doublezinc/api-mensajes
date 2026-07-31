@@ -1,6 +1,8 @@
 const { request, response } = require('express');
 const { databaseIsReady } = require('../config/database');
 const Reserva = require('../models/reserva.modelo');
+const PricingRules = require('../models/pricing.modelo');
+const PRICING_DEFAULTS = require('../config/pricing-defaults');
 
 const escapeRegex = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
@@ -98,15 +100,33 @@ const actualizarEstado = async (req = request, res = response) => {
       }
     }
 
+    const update = {
+      status: req.body.status,
+      statusNotes: req.body.notes || '',
+      statusUpdatedAt: new Date()
+    };
+
+    if (req.body.status === 'cancelled') {
+      const current = await Reserva.findOne({ quoteId: req.params.quoteId })
+        .select('contact.moveDate')
+        .lean();
+      if (!current) {
+        return res.status(404).json({ ok: false, message: 'Reserva no encontrada' });
+      }
+
+      const rules = await PricingRules.findOne({}).lean();
+      const deadlineHours = Number(rules?.cancellationDeadlineHours ?? PRICING_DEFAULTS.cancellationDeadlineHours);
+      const moveDate = new Date(`${current.contact.moveDate}T00:00:00`);
+      const now = new Date();
+      const hoursUntilMove = (moveDate.getTime() - now.getTime()) / (60 * 60 * 1000);
+
+      update.cancelledAt = now;
+      update.depositRefundable = hoursUntilMove >= deadlineHours;
+    }
+
     const item = await Reserva.findOneAndUpdate(
       { quoteId: req.params.quoteId },
-      {
-        $set: {
-          status: req.body.status,
-          statusNotes: req.body.notes || '',
-          statusUpdatedAt: new Date()
-        }
-      },
+      { $set: update },
       { new: true, runValidators: true }
     ).lean();
 

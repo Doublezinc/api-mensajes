@@ -56,6 +56,10 @@ const ReservaSchema = new Schema({
     type: Schema.Types.Mixed,
     required: true
   },
+  cancellationDeadlineHours: {
+    type: Number,
+    default: 48
+  },
   contractAccessTokenHash: {
     type: String,
     required: true,
@@ -64,8 +68,6 @@ const ReservaSchema = new Schema({
   status: {
     type: String,
     enum: [
-      'new',
-      'contacted',
       'request_received',
       'awaiting_deposit',
       'deposit_received',
@@ -85,6 +87,14 @@ const ReservaSchema = new Schema({
   statusUpdatedAt: {
     type: Date,
     default: Date.now
+  },
+  cancelledAt: {
+    type: Date,
+    default: null
+  },
+  depositRefundable: {
+    type: Boolean,
+    default: null
   },
   depositStatus: {
     type: String,

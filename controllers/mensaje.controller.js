@@ -1,11 +1,14 @@
 const { request, response } = require("express");
 const crypto = require("crypto");
 const createSMS = require("../helpers/createSMS");
-const { sendMailCotizacion, sendMailEstimacion, sendMailReserva } = require("../helpers/createEmail");
+const { sendMailCotizacion, sendMailEstimacion, sendMailDevisRapide, sendMailReserva } = require("../helpers/createEmail");
 const { databaseIsReady } = require("../config/database");
 const { getDepositInstructions } = require("../config/deposit");
 const Reserva = require("../models/reserva.modelo");
+const PricingRules = require("../models/pricing.modelo");
+const PRICING_DEFAULTS = require("../config/pricing-defaults");
 const { createContractPdf } = require("../utils/contractPdf");
+const { createQuickQuotePdf } = require("../utils/quickQuotePdf");
 
 const issueContractToken = async (reservationId) => {
     const token = crypto.randomBytes(24).toString("hex");
@@ -99,6 +102,37 @@ const nuevoEmailEstimacion = async (req = request, res = response) => {
 
 }
 
+const nuevoDevisRapide = async (req = request, res = response) => {
+    try {
+        const quickQuotePayload = {
+            ...req.body,
+            depositAmount: PRICING_DEFAULTS.deposit
+        };
+        const quickQuotePdf = await createQuickQuotePdf(quickQuotePayload);
+        const emailEnviado = await sendMailDevisRapide(quickQuotePayload, quickQuotePdf);
+
+        if (!emailEnviado) {
+            return res.status(502).json({
+                ok: false,
+                message: "No fue posible enviar la solicitud rapida"
+            });
+        }
+
+        return res.status(200).json({
+            ok: true,
+            message: "Solicitud rapida enviada",
+            pdf: quickQuotePdf.toString("base64"),
+            pdfFilename: `devis-rapide-${String(req.body.phone).replace(/\D/g, "") || "client"}.pdf`
+        });
+    } catch (error) {
+        console.error("Error al procesar la solicitud rapida:", error);
+        return res.status(500).json({
+            ok: false,
+            message: "Error al procesar la solicitud rapida"
+        });
+    }
+};
+
 const nuevaReserva = async (req = request, res = response) => {
     if (!databaseIsReady()) {
         return res.status(503).json({
@@ -112,6 +146,10 @@ const nuevaReserva = async (req = request, res = response) => {
             req.body.quoteId,
             req.body.estimate.deposit
         );
+        const pricingRules = await PricingRules.findOne({}).lean();
+        const cancellationDeadlineHours = Number(
+            pricingRules?.cancellationDeadlineHours ?? PRICING_DEFAULTS.cancellationDeadlineHours
+        );
         const initialToken = crypto.randomBytes(24).toString("hex");
         const initialTokenHash = crypto.createHash("sha256").update(initialToken).digest("hex");
         let reserva;
@@ -122,6 +160,7 @@ const nuevaReserva = async (req = request, res = response) => {
                     $setOnInsert: {
                         ...req.body,
                         depositInstructions,
+                        cancellationDeadlineHours,
                         contractAccessTokenHash: initialTokenHash
                     }
                 },
@@ -179,7 +218,8 @@ const nuevaReserva = async (req = request, res = response) => {
 
         const contractPayload = {
             ...req.body,
-            depositInstructions: reserva.depositInstructions || depositInstructions
+            depositInstructions: reserva.depositInstructions || depositInstructions,
+            cancellationDeadlineHours
         };
         const contractPdf = await createContractPdf(contractPayload);
         const emailEnviado = await sendMailReserva(contractPayload, contractPdf);
@@ -235,5 +275,6 @@ module.exports = {
     nuevoSMS,
     nuevoEmailCotizacion,
     nuevoEmailEstimacion,
+    nuevoDevisRapide,
     nuevaReserva
 }

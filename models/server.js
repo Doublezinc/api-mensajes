@@ -1,6 +1,21 @@
 const express = require('express');
 const cors = require('cors');
+const rateLimit = require('express-rate-limit');
 const { connectDatabase } = require('../config/database');
+
+const DEFAULT_ALLOWED_ORIGINS = [
+    'http://localhost:4200',
+    'https://transportdoublez.com',
+    'https://www.transportdoublez.com'
+];
+
+const getAllowedOrigins = () => {
+    const configured = (process.env.CORS_ALLOWED_ORIGINS || '')
+        .split(',')
+        .map(origin => origin.trim())
+        .filter(Boolean);
+    return configured.length ? configured : DEFAULT_ALLOWED_ORIGINS;
+};
 
 class Server{
 
@@ -13,7 +28,9 @@ class Server{
             mensajes: '/api/mensajes',
             archivos: '/api/archivos',
             reservasAdmin: '/api/admin/reservas',
-            reservasPublic: '/api/reservas'
+            reservasPublic: '/api/reservas',
+            pricingPublic: '/api/pricing',
+            pricingAdmin: '/api/admin/pricing'
         }
 
         this.middlewares();
@@ -21,12 +38,42 @@ class Server{
 
         this.routes();
 
+        this.errorHandler();
+
     }
 
     middlewares(){
 
-         // CORS 
-        this.app.use(cors());
+        // CORS restringido a orígenes permitidos (CORS_ALLOWED_ORIGINS en .env, separados por coma)
+        const allowedOrigins = getAllowedOrigins();
+        this.app.use(cors({
+            origin: (origin, callback) => {
+                if (!origin || allowedOrigins.includes(origin)) {
+                    return callback(null, true);
+                }
+                return callback(new Error('Origen no permitido por CORS'));
+            }
+        }));
+
+        // Límite de solicitudes para los endpoints públicos
+        const publicApiLimiter = rateLimit({
+            windowMs: 15 * 60 * 1000,
+            limit: 60,
+            standardHeaders: true,
+            legacyHeaders: false,
+            message: { ok: false, message: 'Demasiadas solicitudes. Intente de nuevo más tarde.' }
+        });
+        this.app.use(['/api/mensajes', '/api/reservas', '/api/pricing'], publicApiLimiter);
+
+        // Límite de solicitudes para el panel administrativo (protege la clave contra fuerza bruta)
+        const adminApiLimiter = rateLimit({
+            windowMs: 15 * 60 * 1000,
+            limit: 100,
+            standardHeaders: true,
+            legacyHeaders: false,
+            message: { ok: false, message: 'Demasiadas solicitudes. Intente de nuevo más tarde.' }
+        });
+        this.app.use(['/api/admin/reservas', '/api/admin/pricing'], adminApiLimiter);
 
         // lectura y parceo de el body
         this.app.use(express.json());
@@ -42,6 +89,17 @@ class Server{
         this.app.use(this.paths.archivos, require('../routes/archivos.route'));
         this.app.use(this.paths.reservasAdmin, require('../routes/reservas-admin.route'));
         this.app.use(this.paths.reservasPublic, require('../routes/reservas-public.route'));
+        this.app.use(this.paths.pricingPublic, require('../routes/pricing.route'));
+        this.app.use(this.paths.pricingAdmin, require('../routes/pricing-admin.route'));
+    }
+
+    errorHandler(){
+        this.app.use((error, req, res, next) => {
+            if (error && error.message === 'Origen no permitido por CORS') {
+                return res.status(403).json({ ok: false, message: 'Origen no permitido' });
+            }
+            return next(error);
+        });
     }
 
     async listen(){
