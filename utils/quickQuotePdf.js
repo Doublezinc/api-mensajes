@@ -59,15 +59,16 @@ const createQuickQuotePdf = (quote) => new Promise((resolve, reject) => {
   row('Telephone', quote.phone);
   row('Estimation indicative', quote.estimate);
 
-  doc.moveDown(0.6);
+  doc.moveDown(0.9);
+  const depositBoxY = doc.y;
   doc
-    .rect(doc.x, doc.y, 500, 96)
+    .rect(doc.x, depositBoxY, 500, 118)
     .fill('#fee2e2');
   doc
     .fillColor('#111827')
     .font('Helvetica-Bold')
     .fontSize(13)
-    .text('Depot de reservation', 72, doc.y - 82);
+    .text('Depot de reservation', 72, depositBoxY + 16, { width: 460 });
   doc
     .font('Helvetica')
     .fontSize(11)
@@ -75,11 +76,11 @@ const createQuickQuotePdf = (quote) => new Promise((resolve, reject) => {
     .text(
       `Un depot de ${quote.depositAmount} CAD sera demande pour bloquer la date apres validation par notre equipe. Ce depot est deduit du montant final. Le prix final sera confirme par telephone selon les details reels du demenagement.`,
       72,
-      doc.y + 8,
+      depositBoxY + 42,
       { width: 460, lineGap: 3 }
     );
 
-  doc.moveDown(4);
+  doc.y = depositBoxY + 138;
   doc
     .font('Helvetica-Bold')
     .fontSize(12)
