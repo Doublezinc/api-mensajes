@@ -30,7 +30,9 @@ class Server{
             reservasAdmin: '/api/admin/reservas',
             reservasPublic: '/api/reservas',
             pricingPublic: '/api/pricing',
-            pricingAdmin: '/api/admin/pricing'
+            pricingAdmin: '/api/admin/pricing',
+            petitsTransports: '/api/petits-transports',
+            petitsTransportsAdmin: '/api/admin/petits-transports'
         }
 
         this.middlewares();
@@ -63,7 +65,7 @@ class Server{
             legacyHeaders: false,
             message: { ok: false, message: 'Demasiadas solicitudes. Intente de nuevo más tarde.' }
         });
-        this.app.use(['/api/mensajes', '/api/reservas', '/api/pricing'], publicApiLimiter);
+        this.app.use(['/api/mensajes', '/api/reservas', '/api/pricing', '/api/petits-transports'], publicApiLimiter);
 
         // Límite de solicitudes para el panel administrativo (protege la clave contra fuerza bruta)
         const adminApiLimiter = rateLimit({
@@ -73,7 +75,7 @@ class Server{
             legacyHeaders: false,
             message: { ok: false, message: 'Demasiadas solicitudes. Intente de nuevo más tarde.' }
         });
-        this.app.use(['/api/admin/reservas', '/api/admin/pricing'], adminApiLimiter);
+        this.app.use(['/api/admin/reservas', '/api/admin/pricing', '/api/admin/petits-transports'], adminApiLimiter);
 
         // lectura y parceo de el body
         this.app.use(express.json());
@@ -91,6 +93,8 @@ class Server{
         this.app.use(this.paths.reservasPublic, require('../routes/reservas-public.route'));
         this.app.use(this.paths.pricingPublic, require('../routes/pricing.route'));
         this.app.use(this.paths.pricingAdmin, require('../routes/pricing-admin.route'));
+        this.app.use(this.paths.petitsTransports, require('../routes/petits-transports.route'));
+        this.app.use(this.paths.petitsTransportsAdmin, require('../routes/petits-transports-admin.route'));
     }
 
     errorHandler(){
