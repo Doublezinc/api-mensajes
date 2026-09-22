@@ -206,13 +206,6 @@ const sendMailReserva = async (body, contractPdf) => {
 };
 
 const sendMailPetitTransport = async (booking, icsFile) => {
-  const transport = nodemailer.createTransport(
-    postmarkTransport({
-      auth: {
-        apiKey: process.env.POSTMARKKEY
-      }
-    })
-  );
   const from = 'demenagement@transportdoublez.com';
   const reservationEmail = process.env.RESERVATION_EMAIL || from;
   const when = `${formatDate(booking.date)} ${booking.slot}`;
@@ -222,29 +215,38 @@ const sendMailPetitTransport = async (booking, icsFile) => {
     contentType: 'text/calendar; charset=utf-8; method=PUBLISH'
   };
 
-  const messages = [
-    transport.sendMail({
-      from,
-      to: reservationEmail,
-      subject: `${booking.bookingId} · Petit transport ${when} · ${booking.contact.name}`,
-      text: `Petit transport ${booking.bookingId} le ${when} pour ${booking.contact.name} (${booking.contact.phone})`,
-      html: crearHtmlPetitTransportInterno(booking),
-      attachments: [calendarAttachment]
-    })
-  ];
-
-  if (booking.contact.email) {
-    messages.push(transport.sendMail({
-      from,
-      to: booking.contact.email,
-      subject: `${booking.bookingId} · Votre petit transport · Groupe Double Z`,
-      text: `Votre demande de transport ${booking.bookingId} (${when}) est reçue.`,
-      html: crearHtmlPetitTransportCliente(booking),
-      attachments: [calendarAttachment]
-    }));
-  }
-
+  // Todo dentro del try: postmarkTransport lanza de forma síncrona si la clave es inválida
   try {
+    const transport = nodemailer.createTransport(
+      postmarkTransport({
+        auth: {
+          apiKey: process.env.POSTMARKKEY
+        }
+      })
+    );
+
+    const messages = [
+      transport.sendMail({
+        from,
+        to: reservationEmail,
+        subject: `${booking.bookingId} · Petit transport ${when} · ${booking.contact.name}`,
+        text: `Petit transport ${booking.bookingId} le ${when} pour ${booking.contact.name} (${booking.contact.phone})`,
+        html: crearHtmlPetitTransportInterno(booking),
+        attachments: [calendarAttachment]
+      })
+    ];
+
+    if (booking.contact.email) {
+      messages.push(transport.sendMail({
+        from,
+        to: booking.contact.email,
+        subject: `${booking.bookingId} · Votre petit transport · Groupe Double Z`,
+        text: `Votre demande de transport ${booking.bookingId} (${when}) est reçue.`,
+        html: crearHtmlPetitTransportCliente(booking),
+        attachments: [calendarAttachment]
+      }));
+    }
+
     await Promise.all(messages);
     return true;
   } catch (error) {

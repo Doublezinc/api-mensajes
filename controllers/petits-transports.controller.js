@@ -111,12 +111,17 @@ const crearPetitTransport = async (req = request, res = response) => {
     return res.status(500).json({ ok: false, message: 'No fue posible registrar la solicitud' });
   }
 
-  const bookingData = booking.toObject();
-  const emailSent = await sendMailPetitTransport(bookingData, createPetitTransportIcs(bookingData));
-  await PetitTransport.updateOne(
-    { _id: booking._id },
-    { $set: { emailStatus: emailSent ? 'sent' : 'failed' } }
-  );
+  // La reserva ya está guardada: un fallo del correo no debe impedir responder al cliente
+  try {
+    const bookingData = booking.toObject();
+    const emailSent = await sendMailPetitTransport(bookingData, createPetitTransportIcs(bookingData));
+    await PetitTransport.updateOne(
+      { _id: booking._id },
+      { $set: { emailStatus: emailSent ? 'sent' : 'failed' } }
+    );
+  } catch (error) {
+    console.error('Error al notificar el petit transport:', error);
+  }
 
   return res.status(201).json({
     ok: true,
