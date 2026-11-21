@@ -5,6 +5,24 @@ const { crearHtmlParaCorreoCotizacion, crearHtmlParaCorreoEstimacion } = require
 const { crearHtmlReservaInterna, crearHtmlConfirmacionCliente } = require('../utils/reservationTemplates');
 const { crearHtmlPetitTransportInterno, crearHtmlPetitTransportCliente, formatDate } = require('../utils/petitTransportTemplates');
 
+// Transporte de correo: usa el SMTP de Hostinger si está configurado (SMTP_HOST, SMTP_USER, SMTP_PASS),
+// así los correos salen autenticados con el dominio transportdoublez.com y no caen en spam.
+// Si no hay SMTP configurado, se sigue usando Postmark como antes.
+const crearTransporte = () => {
+  if (process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS) {
+    const port = Number(process.env.SMTP_PORT || 465);
+    return nodemailer.createTransport({
+      host: process.env.SMTP_HOST,
+      port,
+      secure: port === 465,
+      auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS }
+    });
+  }
+  return nodemailer.createTransport(
+    postmarkTransport({ auth: { apiKey: process.env.POSTMARKKEY } })
+  );
+};
+
 
 const sendMailCotizacion = async (body) => {
 
@@ -14,13 +32,7 @@ const sendMailCotizacion = async (body) => {
 
   try {
 
-    const transport = nodemailer.createTransport(
-      postmarkTransport({
-        auth: {
-          apiKey: process.env.POSTMARKKEY // Reemplaza 'tu_api_key' con tu API key de Postmark
-        }
-      })
-    );
+    const transport = crearTransporte();
 
     const info = await transport.sendMail({
       from: 'demenagement@transportdoublez.com', // sender address
@@ -52,13 +64,7 @@ const sendMailEstimacion = async (body) => {
 
   try {
 
-    const transport = nodemailer.createTransport(
-      postmarkTransport({
-        auth: {
-          apiKey: process.env.POSTMARKKEY // Reemplaza 'tu_api_key' con tu API key de Postmark
-        }
-      })
-    );
+    const transport = crearTransporte();
 
     const info = await transport.sendMail({
       from: 'demenagement@transportdoublez.com', // sender address
@@ -104,13 +110,7 @@ const sendMailDevisRapide = async (body, quickQuotePdf) => {
   } = body;
 
   try {
-    const transport = nodemailer.createTransport(
-      postmarkTransport({
-        auth: {
-          apiKey: process.env.POSTMARKKEY
-        }
-      })
-    );
+    const transport = crearTransporte();
 
     const rows = [
       ['Depart', origin],
@@ -160,13 +160,7 @@ const sendMailDevisRapide = async (body, quickQuotePdf) => {
 };
 
 const sendMailReserva = async (body, contractPdf) => {
-  const transport = nodemailer.createTransport(
-    postmarkTransport({
-      auth: {
-        apiKey: process.env.POSTMARKKEY
-      }
-    })
-  );
+  const transport = crearTransporte();
   const from = 'demenagement@transportdoublez.com';
   const reservationEmail = process.env.RESERVATION_EMAIL || from;
   const clientName = `${body.contact.firstName} ${body.contact.lastName}`;
@@ -217,13 +211,7 @@ const sendMailPetitTransport = async (booking, icsFile) => {
 
   // Todo dentro del try: postmarkTransport lanza de forma síncrona si la clave es inválida
   try {
-    const transport = nodemailer.createTransport(
-      postmarkTransport({
-        auth: {
-          apiKey: process.env.POSTMARKKEY
-        }
-      })
-    );
+    const transport = crearTransporte();
 
     const messages = [
       transport.sendMail({
