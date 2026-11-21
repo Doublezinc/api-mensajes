@@ -34,6 +34,15 @@ const PetitTransportSchema = new Schema({
   },
   items: { type: Number, required: true, min: 1, max: 3 },
   price: { type: Number, required: true, min: 0 },
+  // Detalle del precio: base por artículos + zona + escaleras. custom = ciudad fuera de zona (precio a confirmar)
+  pricing: {
+    base: { type: Number, min: 0 },
+    zone: { type: Number, default: null },
+    distanceFee: { type: Number, min: 0, default: 0 },
+    stairsFee: { type: Number, min: 0, default: 0 },
+    total: { type: Number, min: 0 },
+    custom: { type: Boolean, default: false }
+  },
   currency: { type: String, required: true, default: 'CAD' },
   itemsDescription: { type: String, required: true, trim: true, maxlength: 500 },
   contact: {
