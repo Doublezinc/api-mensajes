@@ -38,7 +38,7 @@ const createPetitTransportIcs = (booking, config = CONFIG) => {
     `Articles (${booking.items}) : ${booking.itemsDescription}`,
     `Départ : ${address(booking.addresses.pickup)}`,
     `Livraison : ${address(booking.addresses.delivery)}`,
-    `Prix : ${booking.price} $`,
+    `Prix : ${booking.price} $${booking.pricing && booking.pricing.custom ? ' (à confirmer, hors zone)' : ''}`,
     booking.notes ? `Notes : ${booking.notes}` : ''
   ].filter(Boolean).join('\n');
 
