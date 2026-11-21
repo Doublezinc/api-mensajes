@@ -5,6 +5,7 @@ const CONFIG = require('../config/petits-transports');
 const PetitTransport = require('../models/petit-transport.modelo');
 const { sendMailPetitTransport } = require('../helpers/createEmail');
 const { createPetitTransportIcs } = require('../utils/petitTransportIcs');
+const { computePrice } = require('../utils/petitTransportPricing');
 const {
   bookableRange,
   upcomingServiceDates,
@@ -76,8 +77,14 @@ const crearPetitTransport = async (req = request, res = response) => {
   }
 
   const items = Number(req.body.items);
-  const price = priceForItems(items);
-  if (price === null) {
+  const addresses = req.body.addresses || {};
+  // Precio: base + zona (ciudad más lejana) + escaleras sin ascensor. Siempre se calcula en el servidor.
+  const pricing = priceForItems(items) === null ? null : computePrice({
+    items,
+    pickup: addresses.pickup,
+    delivery: addresses.delivery
+  });
+  if (pricing === null) {
     return res.status(400).json({ ok: false, message: 'Cantidad de artículos inválida' });
   }
 
@@ -89,8 +96,8 @@ const crearPetitTransport = async (req = request, res = response) => {
       slot,
       slotKey: slotKeyFor(date, slot),
       items,
-      // El precio siempre se calcula en el servidor
-      price,
+      price: pricing.total,
+      pricing,
       currency: CONFIG.currency,
       itemsDescription: req.body.itemsDescription,
       contact: req.body.contact,
@@ -130,6 +137,7 @@ const crearPetitTransport = async (req = request, res = response) => {
     slot: booking.slot,
     items: booking.items,
     price: booking.price,
+    pricing: booking.pricing,
     currency: booking.currency,
     status: booking.status,
     message: 'Solicitud de transporte recibida'
