@@ -27,6 +27,18 @@ const address = (value = {}) => {
   return `${base}${access}`;
 };
 
+const priceLabel = (booking) => {
+  const p = booking.pricing;
+  if (!p || p.base === undefined) return `${money(booking.price)} + taxes`;
+  const parts = [`base ${money(p.base)}`];
+  if (p.zone) parts.push(`zone ${p.zone} : ${money(p.distanceFee)}`);
+  if (p.stairsFee) parts.push(`escaliers : ${money(p.stairsFee)}`);
+  const detail = parts.join(' · ');
+  return p.custom
+    ? `À partir de ${money(p.total)} + taxes — hors zone, prix final à confirmer (${detail})`
+    : `${money(p.total)} + taxes (${detail})`;
+};
+
 const line = (label, value) =>
   `<tr><td style="padding:7px 12px;color:#606775;vertical-align:top">${escapeHtml(label)}</td><td style="padding:7px 12px;font-weight:700">${escapeHtml(value)}</td></tr>`;
 
@@ -51,7 +63,7 @@ const detailsTable = (booking) => `
     ${line('Articles', `${booking.items} — ${booking.itemsDescription}`)}
     ${line('Départ', address(booking.addresses.pickup))}
     ${line('Livraison', address(booking.addresses.delivery))}
-    ${line('Prix', `${money(booking.price)} + taxes`)}
+    ${line('Prix', priceLabel(booking))}
   </table>`;
 
 const crearHtmlPetitTransportInterno = (booking) => shell(`Petit transport ${booking.bookingId}`, `
