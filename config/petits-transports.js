@@ -8,8 +8,8 @@ module.exports = {
   // Créneaux por día. Se deja margen entre servicios para desplazamiento, carga y descarga.
   slots: ['08:00', '10:30', '13:00', '15:30'],
   slotDurationMinutes: 120,
-  // Precio fijo según la cantidad de artículos (impuestos no incluidos)
-  prices: { 1: 100, 2: 125, 3: 150 },
+  // Precio de base (« à partir de ») según la cantidad de artículos (impuestos no incluidos)
+  prices: { 1: 120, 2: 150, 3: 180 },
   maxItems: 3,
   // Cuántos días hacia adelante se muestran disponibles y a partir de cuándo se puede reservar
   bookingWindowDays: 28,
