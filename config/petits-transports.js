@@ -14,7 +14,7 @@ module.exports = {
   // Cuántos días hacia adelante se muestran disponibles y a partir de cuándo se puede reservar
   bookingWindowDays: 28,
   minDaysAhead: 1,
-  // Zona donde aplica la tarifa fija
+  // Zona de servicio (los cargos por zona están en utils/petitTransportPricing.js)
   serviceArea: ['Montréal', 'Laval'],
-  serviceAreaNote: "Tarif applicable pour les transports dans Montréal, Laval et secteurs admissibles. Des frais supplémentaires peuvent s'appliquer selon la distance, les escaliers, le poids ou les conditions particulières."
+  serviceAreaNote: "Prix calculé selon le nombre d'articles, la zone (ville la plus éloignée de Laval) et les escaliers sans ascenseur (20 $ par étage au-dessus du 1er). Hors des zones desservies, le prix final est confirmé par téléphone. Des frais peuvent s'ajouter pour un objet très lourd ou des conditions particulières."
 };
