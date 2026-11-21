@@ -7,20 +7,34 @@ const { crearHtmlPetitTransportInterno, crearHtmlPetitTransportCliente, formatDa
 
 // Transporte de correo: usa el SMTP de Hostinger si está configurado (SMTP_HOST, SMTP_USER, SMTP_PASS),
 // así los correos salen autenticados con el dominio transportdoublez.com y no caen en spam.
-// Si no hay SMTP configurado, se sigue usando Postmark como antes.
+// Si el SMTP falla (por ejemplo, contraseña incorrecta), el correo se envía igual por Postmark,
+// para que el cliente nunca vea un error. Sin SMTP configurado, se usa Postmark como antes.
+const crearTransportePostmark = () => nodemailer.createTransport(
+  postmarkTransport({ auth: { apiKey: process.env.POSTMARKKEY } })
+);
+
 const crearTransporte = () => {
-  if (process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS) {
-    const port = Number(process.env.SMTP_PORT || 465);
-    return nodemailer.createTransport({
-      host: process.env.SMTP_HOST,
-      port,
-      secure: port === 465,
-      auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS }
-    });
+  if (!(process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS)) {
+    return crearTransportePostmark();
   }
-  return nodemailer.createTransport(
-    postmarkTransport({ auth: { apiKey: process.env.POSTMARKKEY } })
-  );
+  const port = Number(process.env.SMTP_PORT || 465);
+  const smtp = nodemailer.createTransport({
+    host: process.env.SMTP_HOST,
+    port,
+    secure: port === 465,
+    auth: { user: process.env.SMTP_USER.trim(), pass: process.env.SMTP_PASS },
+    connectionTimeout: 15000
+  });
+  return {
+    sendMail: async (mensaje) => {
+      try {
+        return await smtp.sendMail(mensaje);
+      } catch (error) {
+        console.error('SMTP Hostinger falló, se usa Postmark:', error && error.message);
+        return crearTransportePostmark().sendMail(mensaje);
+      }
+    }
+  };
 };
 
 
