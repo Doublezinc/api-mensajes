@@ -74,7 +74,7 @@ const createQuickQuotePdf = (quote) => new Promise((resolve, reject) => {
     .fontSize(11)
     .fillColor('#374151')
     .text(
-      `Un depot de ${quote.depositAmount} CAD sera demande pour bloquer la date apres validation par notre equipe. Ce depot est deduit du montant final. Le prix final sera confirme par telephone selon les details reels du demenagement.`,
+      `Un depot ${quote.depositAmount} sera demande pour bloquer la date apres validation par notre equipe. Ce depot est deduit du montant final. Le prix final sera confirme par telephone selon les details reels du demenagement.`,
       72,
       depositBoxY + 42,
       { width: 460, lineGap: 3 }
