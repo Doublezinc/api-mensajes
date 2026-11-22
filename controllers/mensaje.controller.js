@@ -104,9 +104,19 @@ const nuevoEmailEstimacion = async (req = request, res = response) => {
 
 const nuevoDevisRapide = async (req = request, res = response) => {
     try {
+        // Dépôt = 25 % du montant estimé (minimum 50 $, arrondi à 5 $).
+        // Si aucun montant n'est connu (soumission express), on indique le pourcentage.
+        const DEPOSIT_RATE = 0.25;
+        const DEPOSIT_MIN = 50;
+        // Montant reconnu seulement s'il est suivi de « $ », « CAD » ou d'un tiret (ex. « 350 - 550 $ »)
+        const estimateMatch = String(req.body.estimate || "").match(/(\d[\d\s]*)(?:[.,]\d+)?\s*(?:\$|CAD|-|–)/i);
+        const estimateLow = estimateMatch ? Number(estimateMatch[1].replace(/\s/g, "")) : 0;
+        const depositAmount = estimateLow > 0
+            ? `de ${Math.max(DEPOSIT_MIN, Math.round((estimateLow * DEPOSIT_RATE) / 5) * 5)} CAD (25 % du montant estime)`
+            : `de 25 % du montant total (minimum ${DEPOSIT_MIN} CAD)`;
         const quickQuotePayload = {
             ...req.body,
-            depositAmount: PRICING_DEFAULTS.deposit
+            depositAmount
         };
         const quickQuotePdf = await createQuickQuotePdf(quickQuotePayload);
         const emailEnviado = await sendMailDevisRapide(quickQuotePayload, quickQuotePdf);
