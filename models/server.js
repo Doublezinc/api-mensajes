@@ -98,6 +98,12 @@ class Server{
         this.app.use(this.paths.petitsTransports, require('../routes/petits-transports.route'));
         this.app.use(this.paths.petitsTransportsAdmin, require('../routes/petits-transports-admin.route'));
         this.app.use('/api/soumission-web', require('../routes/soumission-web.route'));
+        // Agenda des services confirmés + rappels automatiques (une erreur ici ne doit pas bloquer le reste de l'API)
+        try {
+            this.app.use('/api/admin/agenda', require('../routes/agenda-admin.route'));
+        } catch (error) {
+            console.error('Agenda désactivé :', error.message);
+        }
     }
 
     errorHandler(){
