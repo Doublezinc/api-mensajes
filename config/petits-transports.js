@@ -1,10 +1,10 @@
-// Configuración de los "Petits transports" (servicio de lunes y martes con tarifa fija).
+// Configuración de los "Petits transports" (servicio todos los días con tarifa fija).
 // Los valores pueden ajustarse sin tocar la lógica de reservas.
 module.exports = {
   timezone: 'America/Montreal',
   currency: 'CAD',
-  // Días de la semana habilitados (0 = domingo, 1 = lunes, 2 = martes)
-  weekdays: [1, 2],
+  // Días de la semana habilitados (0 = domingo … 6 = sábado): todos los días
+  weekdays: [0, 1, 2, 3, 4, 5, 6],
   // Créneaux por día. Se deja margen entre servicios para desplazamiento, carga y descarga.
   slots: ['08:00', '10:30', '13:00', '15:30'],
   slotDurationMinutes: 120,
