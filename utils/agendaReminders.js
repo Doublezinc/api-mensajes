@@ -100,7 +100,8 @@ const T = {
     tipsTitle: 'Pour que tout se passe bien :',
     change: 'Un changement ? Appelez-nous au <b>514-234-9971</b>.',
     bye: 'À bientôt,',
-    sms: (s, d, h) => `Groupe Double Z : rappel de votre ${s} demain ${d}${h ? ` a ${h}` : ''}. Questions : 514-234-9971`
+    sms: (s, d, h) => `Groupe Double Z : rappel de votre ${s} demain ${d}${h ? ` a ${h}` : ''}. Questions : 514-234-9971 - www.transportdoublez.com`,
+    site: 'https://www.transportdoublez.com/', siteBtn: 'Visitez notre site web'
   },
   en: {
     subj2: (s, d) => `Reminder: your ${s} on ${d} – Groupe Double Z`,
@@ -113,7 +114,8 @@ const T = {
     tipsTitle: 'To make everything go smoothly:',
     change: 'Any change? Call us at <b>514-234-9971</b>.',
     bye: 'See you soon,',
-    sms: (s, d, h) => `Groupe Double Z: reminder of your ${s} tomorrow ${d}${h ? ` at ${h}` : ''}. Questions: 514-234-9971`
+    sms: (s, d, h) => `Groupe Double Z: reminder of your ${s} tomorrow ${d}${h ? ` at ${h}` : ''}. Questions: 514-234-9971 - www.transportdoublez.com/en/`,
+    site: 'https://www.transportdoublez.com/en/', siteBtn: 'Visit our website'
   },
   es: {
     subj2: (s, d) => `Recordatorio: su ${s} del ${d} – Groupe Double Z`,
@@ -126,7 +128,8 @@ const T = {
     tipsTitle: 'Para que todo salga bien:',
     change: '¿Algún cambio? Llámenos al <b>514-234-9971</b>.',
     bye: 'Hasta pronto,',
-    sms: (s, d, h) => `Groupe Double Z: recordatorio de su ${s} manana ${d}${h ? ` a las ${h}` : ''}. Preguntas: 514-234-9971`
+    sms: (s, d, h) => `Groupe Double Z: recordatorio de su ${s} manana ${d}${h ? ` a las ${h}` : ''}. Preguntas: 514-234-9971 - www.transportdoublez.com/es/`,
+    site: 'https://www.transportdoublez.com/es/', siteBtn: 'Visite nuestro sitio web'
   }
 };
 const firstName = (n) => String(n || '').trim().split(/\s+/)[0] || '';
@@ -150,8 +153,9 @@ const clientEmail = (it, kind) => {
     ${rows ? `<div style="background:#fdf1f1;border-radius:10px;padding:12px 14px;margin:0 0 14px">${rows}</div>` : ''}
     ${kind === 1 ? `<p style="margin:0 0 6px"><b>${t.tipsTitle}</b></p><ul style="margin:0 0 14px;padding-left:20px">${t.tips.map((x) => `<li>${x}</li>`).join('')}</ul>` : ''}
     <p style="margin:0 0 16px">${t.change}</p>
+    <p style="margin:0 0 18px"><a href="${t.site}" style="display:inline-block;background:#D7141A;color:#fff;text-decoration:none;font-weight:bold;padding:10px 18px;border-radius:8px">${t.siteBtn}</a></p>
     <p style="margin:0">${t.bye}<br><b>Groupe Double Z</b><br><i style="color:#D7141A">Déménagement Unique et Efficace</i></p>`);
-  return { subject: kind === 1 ? t.subj1(s) : t.subj2(s, d), html, text: `${t.hi(firstName(it.clientName))} ${kind === 1 ? t.subj1(s) : t.subj2(s, d)} – 514-234-9971` };
+  return { subject: kind === 1 ? t.subj1(s) : t.subj2(s, d), html, text: `${t.hi(firstName(it.clientName))} ${kind === 1 ? t.subj1(s) : t.subj2(s, d)} – 514-234-9971 – ${t.site}` };
 };
 const clientSms = (it) => {
   const lang = T[it.language] ? it.language : 'fr';
