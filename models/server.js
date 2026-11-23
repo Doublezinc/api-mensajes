@@ -78,6 +78,8 @@ class Server{
         this.app.use(['/api/admin/reservas', '/api/admin/pricing', '/api/admin/petits-transports'], adminApiLimiter);
 
         // lectura y parceo de el body
+        // La soumission web envoie le PDF du client (plus lourd que la limite par défaut de 100 ko)
+        this.app.use('/api/soumission-web', express.json({ limit: '6mb' }));
         this.app.use(express.json());
 
          // Direcctorio publico
@@ -95,6 +97,7 @@ class Server{
         this.app.use(this.paths.pricingAdmin, require('../routes/pricing-admin.route'));
         this.app.use(this.paths.petitsTransports, require('../routes/petits-transports.route'));
         this.app.use(this.paths.petitsTransportsAdmin, require('../routes/petits-transports-admin.route'));
+        this.app.use('/api/soumission-web', require('../routes/soumission-web.route'));
     }
 
     errorHandler(){
