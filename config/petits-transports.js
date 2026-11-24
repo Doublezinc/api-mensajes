@@ -9,12 +9,12 @@ module.exports = {
   slots: ['08:00', '10:30', '13:00', '15:30'],
   slotDurationMinutes: 120,
   // Precio de base (« à partir de ») según la cantidad de artículos (impuestos no incluidos)
-  prices: { 1: 120, 2: 150, 3: 180 },
+  prices: { 1: 180, 2: 210, 3: 240 },
   maxItems: 3,
   // Cuántos días hacia adelante se muestran disponibles y a partir de cuándo se puede reservar
   bookingWindowDays: 28,
   minDaysAhead: 1,
   // Zona de servicio (los cargos por zona están en utils/petitTransportPricing.js)
   serviceArea: ['Montréal', 'Laval'],
-  serviceAreaNote: "Prix calculé selon le nombre d'articles, la zone (ville la plus éloignée de Laval) et les escaliers sans ascenseur (20 $ par étage au-dessus du 1er). Hors des zones desservies, le prix final est confirmé par téléphone. Des frais peuvent s'ajouter pour un objet très lourd ou des conditions particulières."
+  serviceAreaNote: "Prix avec 2 déménageurs, calculé selon le nombre d'articles, la zone (ville la plus éloignée de Laval) et les escaliers sans ascenseur (20 $ par étage au-dessus du 1er). Hors des zones desservies, le prix final est confirmé par téléphone. Des frais peuvent s'ajouter pour un objet très lourd ou des conditions particulières."
 };
