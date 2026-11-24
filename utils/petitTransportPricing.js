@@ -5,7 +5,7 @@
 // Este mismo código está copiado en las páginas petits-transports del sitio (FR/EN/ES):
 // si se cambia aquí, hay que cambiarlo también allá.
 (function (root) {
-  var BASE = { 1: 120, 2: 150, 3: 180 };
+  var BASE = { 1: 180, 2: 210, 3: 240 }; // toujours 2 déménageurs
   var ZONE_FEES = { 1: 0, 2: 40, 3: 80 };
   var STAIR_FEE = 20;
 
